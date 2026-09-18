@@ -1,123 +1,263 @@
 <!doctype html>
 <html lang="bn">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#07090d">
-  <meta name="description" content="Private browser-based TikTok HQ video encoder. Video processing happens locally in your browser.">
-  <link rel="manifest" href="manifest.webmanifest">
-  <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
-  <title>TikTok HQ Encoder</title>
-  <style>
-    :root{color-scheme:dark;--bg:#07090d;--card:#11151c;--border:#252c36;--muted:#9fa9b7;--text:#f5f7fa;--soft:#0c1016;--accent:#fff;--danger:#7b1f2a;--ok:#8ce99a;--warn:#ffd27a}
-    *{box-sizing:border-box}
-    html{scroll-behavior:smooth}
-    body{margin:0;background:radial-gradient(circle at top,#151a23 0,#07090d 42%);color:var(--text);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
-    .wrap{width:min(900px,100%);margin:auto;padding:18px 14px 40px}
-    .hero{padding:10px 4px 8px}.brand{display:flex;gap:11px;align-items:center}.logo{width:44px;height:44px;border-radius:13px}.hero h1{font-size:25px;line-height:1.1;margin:0}.hero p{margin:8px 0 0;color:var(--muted);line-height:1.5;font-size:14px}
-    .card{background:rgba(17,21,28,.96);border:1px solid var(--border);border-radius:19px;padding:16px;margin:12px 0;box-shadow:0 14px 38px rgba(0,0,0,.16)}
-    .section-title{font-weight:800;font-size:15px;margin-bottom:10px}.muted{color:var(--muted);font-size:13px;line-height:1.5}
-    .drop{border:1.5px dashed #4b5665;border-radius:16px;padding:24px 15px;text-align:center;background:#0d1117}.drop strong{font-size:18px}.drop input{margin-top:14px}
-    input[type=file],select{width:100%;padding:11px;border-radius:11px;background:var(--soft);color:var(--text);border:1px solid #303946;font:inherit}
-    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.stat{background:var(--soft);border:1px solid #232a34;border-radius:12px;padding:10px;min-width:0}.label{font-size:11px;color:#8f99a7}.value{font-weight:750;margin-top:3px;overflow-wrap:anywhere}
-    .control{margin-top:10px}.control label{display:block;font-size:11px;color:#8f99a7;margin-bottom:5px}
-    button,.download{display:block;width:100%;border:0;border-radius:12px;padding:13px 14px;margin-top:10px;background:var(--accent);color:#0a0c10;font-weight:800;font-size:15px;text-decoration:none;text-align:center;cursor:pointer}.secondary{background:#252c36;color:#fff}.danger{background:var(--danger);color:#fff}.ghost{background:transparent;color:#fff;border:1px solid #303946}
-    button:disabled{opacity:.45;cursor:not-allowed}.hidden{display:none!important}
-    progress{width:100%;height:13px;margin-top:12px}.status{margin-top:8px;min-height:20px}.ok{color:var(--ok)}.warn{color:var(--warn)}.bad{color:#ff8d9b}
-    video{display:block;width:100%;max-height:64vh;background:#000;border-radius:14px;margin-top:10px}.preview-meta{display:flex;justify-content:space-between;gap:12px;font-size:12px;color:var(--muted);margin-top:8px}
-    .pillbar{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}.pill{border:1px solid #303946;border-radius:999px;padding:6px 9px;font-size:11px;color:#c7ced8;background:#0c1016}
-    details{border-top:1px solid #252c36;padding:10px 0}details:first-of-type{border-top:0}summary{cursor:pointer;font-weight:700}.foot{color:#77818e;font-size:11px;line-height:1.5;text-align:center;margin-top:15px}
-    @media(max-width:620px){.row{grid-template-columns:1fr}.grid{grid-template-columns:1fr 1fr}.hero h1{font-size:22px}}
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#07090d">
+<title>TikTok HQ Encoder — Edge Stable</title>
+<style>
+:root{color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:#07090d;color:#f4f6f8;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+.wrap{max-width:820px;margin:auto;padding:16px}
+.card{background:#11151c;border:1px solid #252c36;border-radius:18px;padding:16px;margin:12px 0}
+h1{font-size:22px;margin:0 0 7px}.muted{color:#a9b1bd;font-size:13px;line-height:1.5}
+.drop{border:1.5px dashed #4b5665;border-radius:16px;padding:24px 16px;text-align:center}
+input[type=file],select{width:100%;padding:11px;border-radius:10px;background:#0c1016;color:#fff;border:1px solid #303946}
+button,.download{display:block;width:100%;border:0;border-radius:12px;padding:13px 14px;margin-top:10px;background:#f3f5f7;color:#0a0c10;font-weight:750;font-size:15px;text-decoration:none;text-align:center}
+button:disabled{opacity:.45}.secondary{background:#252c36;color:#fff}.danger{background:#7b1f2a;color:#fff}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{background:#0c1016;border:1px solid #232a34;border-radius:12px;padding:10px}.label{font-size:11px;color:#9da7b4}.value{font-weight:700;margin-top:3px;overflow-wrap:anywhere}
+progress{width:100%;height:13px}video{width:100%;max-height:62vh;background:#000;border-radius:12px;margin-top:10px}
+.ok{color:#8ce99a}.warn{color:#ffd27a}.bad{color:#ff8d9b}.hidden{display:none!important}
+small{color:#8993a1}
+@media(max-width:560px){.row{grid-template-columns:1fr}.grid{grid-template-columns:1fr 1fr}}
+</style>
 </head>
 <body>
 <div class="wrap">
-  <header class="hero">
-    <div class="brand"><img class="logo" src="assets/icon.svg" alt=""><div><h1>TikTok HQ Encoder</h1><div class="pillbar"><span class="pill">1080×1920</span><span class="pill">H.264 High</span><span class="pill">Local processing</span></div></div></div>
-    <p>Private browser-based encoder. Your video is processed locally on your device; this app does not claim to bypass TikTok's server-side compression.</p>
-  </header>
+  <div class="card">
+    <h1>🎬 TikTok HQ Encoder — Edge Stable</h1>
+    <div class="muted">Local browser encoder. ভিডিও তোমার ডিভাইসেই process হবে। এই tool TikTok-এর server-side compression bypass বা হারানো detail magically ফিরিয়ে দেয় না; লক্ষ্য হলো source অনুযায়ী যতটা সম্ভব high-quality 1080×1920 H.264 output তৈরি করা।</div>
+  </div>
 
-  <section class="card">
-    <div class="section-title">1. Choose a video</div>
+  <div class="card">
     <div class="drop">
-      <strong>Select your source video</strong>
-      <div class="muted" style="margin-top:6px">Choose a video from your phone. Nothing is uploaded by this app during encoding.</div>
+      <div style="font-size:18px;font-weight:750">ভিডিও বেছে নাও</div>
+      <div class="muted" style="margin:6px 0 12px">MP4, MOV, WebM ইত্যাদি browser-supported video নির্বাচন করো।</div>
       <input id="file" type="file" accept="video/*,.mp4,.mov,.mkv,.webm">
     </div>
     <div id="info" class="grid" style="margin-top:12px"></div>
-  </section>
+  </div>
 
-  <section class="card">
-    <div class="section-title">2. Encoding settings</div>
+  <div class="card">
     <div class="row">
-      <div class="control"><label for="framing">9:16 framing</label><select id="framing"><option value="crop">Crop — fill full screen</option><option value="contain">Contain — no crop</option><option value="blur">Blur background — no crop</option></select></div>
-      <div class="control"><label for="fps">Frame rate</label><select id="fps"><option value="smart">Smart — preserve source FPS</option><option value="30">30 FPS</option><option value="60">60 FPS</option></select></div>
+      <div>
+        <div class="label">Framing</div>
+        <select id="framing">
+          <option value="crop" selected>9:16 Crop — full screen</option>
+          <option value="contain">9:16 Contain — no crop</option>
+          <option value="blur">9:16 Blur Background — keep all content</option>
+        </select>
+      </div>
+      <div>
+        <div class="label">Frame rate</div>
+        <select id="fps">
+          <option value="smart" selected>Smart — preserve source FPS</option>
+          <option value="30">30 FPS</option>
+          <option value="60">60 FPS</option>
+        </select>
+      </div>
     </div>
-    <div class="row">
-      <div class="control"><label for="quality">Video quality</label><select id="quality"><option value="18">High — CRF 18</option><option value="16" selected>Very High — CRF 16</option><option value="14">Maximum — CRF 14</option></select></div>
-      <div class="control"><label for="maxrate">Bitrate ceiling</label><select id="maxrate"><option value="20M">20 Mbps</option><option value="30M" selected>30 Mbps</option><option value="40M">40 Mbps</option></select></div>
-    </div>
-    <div class="muted" id="preset" style="margin-top:10px">1080×1920 • Smart FPS • H.264 High • yuv420p • AAC 256k • CRF 16 • maxrate 30 Mbps • ~2 sec GOP • faststart</div>
-  </section>
 
-  <section class="card">
-    <div class="section-title">3. Encode</div>
-    <button id="load">Load FFmpeg Engine</button>
-    <button id="encode" disabled>Encode TikTok HQ</button>
+    <div class="row" style="margin-top:10px">
+      <div>
+        <div class="label">Video quality</div>
+        <select id="quality">
+          <option value="18">High — CRF 18</option>
+          <option value="16">Very High — CRF 16</option>
+          <option value="14" selected>Maximum — CRF 14</option>
+        </select>
+      </div>
+      <div>
+        <div class="label">Bitrate ceiling</div>
+        <select id="maxrate">
+          <option value="20M">20 Mbps</option>
+          <option value="30M">30 Mbps</option>
+          <option value="40M" selected>40 Mbps</option>
+        </select>
+      </div>
+    </div>
+
+    <button id="load">1) Load FFmpeg Engine</button>
+    <button id="encode" disabled>2) Encode TikTok HQ</button>
     <button id="cancel" class="danger hidden">Cancel Encoding</button>
-    <progress id="bar" value="0" max="1"></progress>
-    <div id="status" class="status muted">Ready.</div>
-    <a id="download" class="download hidden" download>Download HQ MP4</a>
-    <button id="share" class="secondary hidden">Share Video</button>
-  </section>
+    <progress id="bar" value="0" max="1" style="margin-top:12px"></progress>
+    <div id="status" class="muted" style="margin-top:8px">Ready.</div>
+    <a id="download" class="download hidden" download>⬇️ Download HQ MP4</a>
+    <button id="share" class="secondary hidden">📤 Share Video</button>
+  </div>
 
-  <section class="card hidden" id="previewCard">
-    <div class="section-title">Output preview</div>
+  <div class="card">
+    <b>Current preset</b>
+    <div id="preset" class="muted" style="margin-top:6px">1080×1920 • Smart FPS • H.264 High • yuv420p • CRF 14 • maxrate 40 Mbps • ~2 sec GOP • faststart • AAC 320k</div>
+    <div class="muted" style="margin-top:7px">Best preservation mode is <b>Smart FPS</b>. Selecting 60 FPS on a 30 FPS source does not create new frame detail; it only generates extra frames.</div>
+  </div>
+
+  <div class="card hidden" id="previewCard">
+    <b>Output preview</b>
     <video id="preview" controls playsinline></video>
-    <div class="preview-meta"><span id="outSize">—</span><span>MP4 • H.264 + AAC</span></div>
-  </section>
-
-  <section class="card">
-    <div class="section-title">What this tool does</div>
-    <div class="muted">It re-encodes your video to a consistent vertical 1080×1920 MP4 target using FFmpeg in WebAssembly. It can improve consistency and reduce unnecessary export variables, but it cannot recreate detail that was never present in the source.</div>
-    <div class="pillbar"><span class="pill">No backend</span><span class="pill">No database</span><span class="pill">Local browser processing</span><span class="pill">MP4 output</span></div>
-  </section>
-
-  <section class="card">
-    <details><summary>Why can processing be slow?</summary><div class="muted" style="margin-top:7px">FFmpeg runs in WebAssembly on the device. Longer videos, higher quality settings and weaker phones require more CPU/RAM.</div></details>
-    <details><summary>Does this make a low-quality video true 4K?</summary><div class="muted" style="margin-top:7px">No. Upscaling or re-encoding cannot create genuine source detail that is not present in the original video.</div></details>
-    <details><summary>Why does the first load take time?</summary><div class="muted" style="margin-top:7px">The browser downloads the FFmpeg WebAssembly engine once so the encoding can happen locally.</div></details>
-  </section>
-
-  <div class="foot">Built as a static GitHub Pages site. The app uses ffmpeg.wasm from the official project via CDN. Video content is processed in your browser during normal use.</div>
+  </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.15/dist/umd/ffmpeg.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.2/dist/umd/index.js"></script>
-<script>
-'use strict';
-const $=id=>document.getElementById(id);
-const fileEl=$('file'), info=$('info'), loadBtn=$('load'), encodeBtn=$('encode'), cancelBtn=$('cancel'), bar=$('bar'), status=$('status'), dl=$('download'), shareBtn=$('share'), preview=$('preview'), previewCard=$('previewCard'), outSize=$('outSize');
-const framingEl=$('framing'), fpsEl=$('fps'), qualityEl=$('quality'), maxrateEl=$('maxrate'), presetEl=$('preset');
-let selected=null, ff=null, loaded=false, busy=false, outputUrl=null, sourceFps=30, inputName='input.mp4';
-function fmtMB(n){return(n/1048576).toFixed(1)+' MB'}
+<script type="module">
+const $ = id => document.getElementById(id);
+const fileEl=$('file'),info=$('info'),loadBtn=$('load'),encBtn=$('encode'),cancelBtn=$('cancel');
+const bar=$('bar'),status=$('status'),dl=$('download'),shareBtn=$('share'),preview=$('preview'),previewCard=$('previewCard');
+const framingEl=$('framing'),fpsEl=$('fps'),qualityEl=$('quality'),maxrateEl=$('maxrate'),presetEl=$('preset');
+
+let FFmpegClass=null, util=null, ff=null, selected=null, loaded=false, busy=false, outputUrl=null, inputName='input.mp4';
+
+const CDN = [
+  { main:'https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.15/dist/esm/index.js', util:'https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.2/dist/esm/index.js' },
+  { main:'https://unpkg.com/@ffmpeg/ffmpeg@0.12.15/dist/esm/index.js', util:'https://unpkg.com/@ffmpeg/util@0.12.2/dist/esm/index.js' }
+];
+const CORE = 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.10/dist/umd';
+
+function fmtMB(n){return (n/1024/1024).toFixed(1)+' MB'}
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function setStatus(t,cls='muted'){status.className='status '+cls;status.textContent=t}
-function parseRate(s){if(!s||s==='0/0')return 30;const p=s.split('/').map(Number);if(p.length===2&&p[1])return p[0]/p[1];const n=Number(s);return Number.isFinite(n)&&n>0?n:30}
-function approxGop(fps){return Math.max(1,Math.round(fps*2))}
-function updatePreset(){const f=fpsEl.value==='smart'?'Smart FPS':fpsEl.value+' FPS';presetEl.textContent=`1080×1920 • ${f} • H.264 High • yuv420p • AAC 256k • CRF ${qualityEl.value} • maxrate ${maxrateEl.value} • ~2 sec GOP • faststart`}
-[framingEl,fpsEl,qualityEl,maxrateEl].forEach(x=>x.addEventListener('change',updatePreset));
-function getFFmpegCtor(){return window.FFmpegWASM?.FFmpeg||window.FFmpeg?.FFmpeg||((typeof window.FFmpeg==='function')?window.FFmpeg:null)}
-function getUtil(){return window.FFmpegUtil||window.FFmpeg?.FFmpegUtil||null}
-fileEl.addEventListener('change',async()=>{selected=fileEl.files?.[0]||null;dl.classList.add('hidden');shareBtn.classList.add('hidden');previewCard.classList.add('hidden');bar.value=0;encodeBtn.disabled=!selected||!loaded;if(!selected){info.innerHTML='';return}const u=URL.createObjectURL(selected),v=document.createElement('video');v.preload='metadata';v.src=u;await new Promise(r=>{v.onloadedmetadata=r;v.onerror=r});info.innerHTML=`<div class="stat"><div class="label">File</div><div class="value">${esc(selected.name)}</div></div><div class="stat"><div class="label">Size</div><div class="value">${fmtMB(selected.size)}</div></div><div class="stat"><div class="label">Resolution</div><div class="value">${v.videoWidth||'?'} × ${v.videoHeight||'?'}</div></div><div class="stat"><div class="label">Duration</div><div class="value">${v.duration?v.duration.toFixed(1)+' s':'?'}</div></div>`;URL.revokeObjectURL(u)});
-loadBtn.addEventListener('click',async()=>{if(loaded)return;try{loadBtn.disabled=true;setStatus('Loading FFmpeg engine… first load downloads the WebAssembly core.');const C=getFFmpegCtor(),U=getUtil();if(!C||!U?.toBlobURL)throw new Error('FFmpeg browser library did not load.');ff=new C();ff.on('progress',({progress})=>{if(busy)bar.value=Math.max(0,Math.min(1,progress||0))});ff.on('log',({message})=>{if(message)console.debug('[ffmpeg]',message)});const base='https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.10/dist/umd';await ff.load({coreURL:await U.toBlobURL(base+'/ffmpeg-core.js','text/javascript'),wasmURL:await U.toBlobURL(base+'/ffmpeg-core.wasm','application/wasm')});loaded=true;encodeBtn.disabled=!selected;setStatus('FFmpeg is ready.','ok')}catch(e){loadBtn.disabled=false;setStatus('Engine load failed: '+String(e),'bad')}});
-async function detectFps(name){try{if(!ff?.ffprobe)return 30;const r=await ff.ffprobe(name,['-v','error','-select_streams','v:0','-show_entries','stream=r_frame_rate','-of','default=noprint_wrappers=1:nokey=1']);return parseRate(r)}catch{return 30}}
-function chooseFps(){if(fpsEl.value==='smart')return Math.min(60,Math.max(1,sourceFps||30));return Number(fpsEl.value)}
-function vfFor(mode){if(mode==='crop')return 'scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,setsar=1';if(mode==='contain')return 'scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2:color=black,setsar=1';return 'split=2[bg][fg];[bg]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,boxblur=20:10[bg2];[fg]scale=1080:1920:force_original_aspect_ratio=decrease[fg0];[fg0]pad=1080:1920:(ow-iw)/2:(oh-ih)/2:color=black@0[fg2];[bg2][fg2]overlay=0:0,setsar=1'}
-async function del(name){try{if(ff)await ff.deleteFile(name)}catch{}}
-encodeBtn.addEventListener('click',async()=>{if(!selected||!ff||busy)return;busy=true;encodeBtn.disabled=true;loadBtn.disabled=true;cancelBtn.classList.remove('hidden');dl.classList.add('hidden');shareBtn.classList.add('hidden');previewCard.classList.add('hidden');bar.value=0;const U=getUtil(),ext=(selected.name.split('.').pop()||'mp4').replace(/[^a-z0-9]/gi,'')||'mp4';inputName='input.'+ext;const out='tiktok_hq_1080p.mp4';try{setStatus('Reading source video into local memory…');await ff.writeFile(inputName,await U.fetchFile(selected));sourceFps=await detectFps(inputName);const targetFps=chooseFps(),g=approxGop(targetFps),vf=vfFor(framingEl.value);setStatus(`Encoding 1080×1920 • ${targetFps.toFixed(3).replace(/\.000$/,'')} FPS…`);const mb=parseInt(maxrateEl.value,10);const args=['-i',inputName,'-map','0:v:0','-map','0:a:0?','-vf',vf,'-r',String(targetFps),'-c:v','libx264','-preset','slow','-profile:v','high','-level','4.2','-pix_fmt','yuv420p','-tag:v','avc1','-crf',qualityEl.value,'-maxrate',maxrateEl.value,'-bufsize',String(mb*2)+'M','-g',String(g),'-keyint_min',String(g),'-sc_threshold','0','-movflags','+faststart','-c:a','aac','-b:a','256k','-ar','48000','-ac','2','-shortest',out];const rc=await ff.exec(args);if(rc!==0)throw new Error('FFmpeg exited with code '+rc);const data=await ff.readFile(out);const blob=new Blob([data.buffer],{type:'video/mp4'});if(outputUrl)URL.revokeObjectURL(outputUrl);outputUrl=URL.createObjectURL(blob);preview.src=outputUrl;previewCard.classList.remove('hidden');outSize.textContent=fmtMB(blob.size);const base=(selected.name.replace(/\.[^.]+$/,'')||'video')+'_TikTok_HQ_1080p.mp4';dl.href=outputUrl;dl.download=base;dl.textContent='Download '+base;dl.classList.remove('hidden');shareBtn.classList.toggle('hidden',!('share'in navigator));bar.value=1;setStatus('Encoding complete — HQ MP4 is ready.','ok')}catch(e){console.error(e);setStatus('Encode failed: '+String(e),'bad')}finally{await del(inputName);await del(out);busy=false;encodeBtn.disabled=!selected;loadBtn.disabled=false;cancelBtn.classList.add('hidden')}});
-cancelBtn.addEventListener('click',async()=>{if(!busy||!ff)return;try{await ff.terminate()}catch{}ff=null;loaded=false;busy=false;cancelBtn.classList.add('hidden');encodeBtn.disabled=true;loadBtn.disabled=false;bar.value=0;setStatus('Encoding cancelled. FFmpeg engine reset.');});
-shareBtn.addEventListener('click',async()=>{if(!outputUrl||!navigator.share)return;try{const blob=await(await fetch(outputUrl)).blob();const f=new File([blob],'TikTok_HQ_1080p.mp4',{type:'video/mp4'});if(navigator.canShare?.({files:[f]}))await navigator.share({files:[f],title:'TikTok HQ Video'});else setStatus('File sharing is not supported on this device/browser.','warn')}catch(e){if(e.name!=='AbortError')setStatus('Share failed: '+String(e),'bad')}});
+function setStatus(text,cls='muted'){status.className=cls;status.textContent=text}
+function updatePreset(){
+  const f=fpsEl.value==='smart'?'Smart FPS':fpsEl.value+' FPS';
+  presetEl.textContent=`1080×1920 • ${f} • H.264 High • yuv420p • CRF ${qualityEl.value} • maxrate ${maxrateEl.value} • ~2 sec GOP • faststart • AAC 320k`;
+}
+[framingEl,fpsEl,qualityEl,maxrateEl].forEach(el=>el.addEventListener('change',updatePreset));
+
+async function importLibraries(){
+  let lastError=null;
+  for(const c of CDN){
+    try{
+      setStatus('FFmpeg browser module loading…');
+      const [mainMod, utilMod] = await Promise.all([import(c.main), import(c.util)]);
+      const C = mainMod?.FFmpeg || mainMod?.default?.FFmpeg || mainMod?.default;
+      const U = utilMod;
+      if(typeof C!=='function' || typeof U?.toBlobURL!=='function' || typeof U?.fetchFile!=='function') throw new Error('Required FFmpeg browser exports are missing.');
+      FFmpegClass=C;util=U;return;
+    }catch(e){lastError=e}
+  }
+  throw new Error('FFmpeg browser module could not load. '+(lastError?.message||String(lastError||'')));
+}
+
+fileEl.addEventListener('change',async()=>{
+  selected=fileEl.files?.[0]||null;
+  dl.classList.add('hidden');shareBtn.classList.add('hidden');previewCard.classList.add('hidden');bar.value=0;
+  encBtn.disabled=!selected||!loaded;
+  if(!selected){info.innerHTML='';return}
+  const u=URL.createObjectURL(selected),v=document.createElement('video');
+  v.preload='metadata';v.muted=true;v.src=u;
+  await new Promise(resolve=>{
+    let done=false;const finish=()=>{if(!done){done=true;resolve()}};
+    v.onloadedmetadata=finish;v.onerror=finish;setTimeout(finish,7000);
+  });
+  const w=v.videoWidth||0,h=v.videoHeight||0,d=Number.isFinite(v.duration)?v.duration:0;
+  info.innerHTML=`
+    <div class="stat"><div class="label">File</div><div class="value">${esc(selected.name)}</div></div>
+    <div class="stat"><div class="label">Size</div><div class="value">${fmtMB(selected.size)}</div></div>
+    <div class="stat"><div class="label">Resolution</div><div class="value">${w||'?'} × ${h||'?'}</div></div>
+    <div class="stat"><div class="label">Duration</div><div class="value">${d?d.toFixed(1)+' s':'?'}</div></div>`;
+  URL.revokeObjectURL(u);
+});
+
+async function loadEngine(){
+  if(loaded)return;
+  loadBtn.disabled=true;
+  try{
+    if(!FFmpegClass||!util) await importLibraries();
+    setStatus('FFmpeg core loading… first load may take tens of MB.');
+    ff=new FFmpegClass();
+    ff.on('progress',({progress})=>{if(busy)bar.value=Math.max(0,Math.min(1,Number(progress)||0))});
+    ff.on('log',({message})=>{if(message) console.debug('[FFmpeg]',message)});
+    await ff.load({
+      coreURL:await util.toBlobURL(CORE+'/ffmpeg-core.js','text/javascript'),
+      wasmURL:await util.toBlobURL(CORE+'/ffmpeg-core.wasm','application/wasm')
+    });
+    loaded=true;encBtn.disabled=!selected;setStatus('✅ FFmpeg ready. এখন Encode চাপতে পারো.','ok');
+  }catch(e){
+    console.error(e);loaded=false;ff=null;encBtn.disabled=true;
+    setStatus('❌ Engine load failed: '+(e?.message||String(e)),'bad');
+  }finally{loadBtn.disabled=loaded?true:false}
+}
+loadBtn.addEventListener('click',loadEngine);
+
+function videoFilter(mode){
+  if(mode==='crop') return 'scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,setsar=1';
+  if(mode==='contain') return 'scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2:color=black,setsar=1';
+  return 'split=2[bg][fg];[bg]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,boxblur=18:8[bg2];[fg]scale=1080:1920:force_original_aspect_ratio=decrease[fg2];[bg2][fg2]overlay=(W-w)/2:(H-h)/2,setsar=1';
+}
+
+async function cleanupFile(name){try{await ff?.deleteFile(name)}catch(_){} }
+
+async function encode(){
+  if(!selected||!ff||!loaded||busy)return;
+  busy=true;encBtn.disabled=true;loadBtn.disabled=true;cancelBtn.classList.remove('hidden');
+  dl.classList.add('hidden');shareBtn.classList.add('hidden');previewCard.classList.add('hidden');bar.value=0;
+  const ext=(selected.name.split('.').pop()||'mp4').replace(/[^a-z0-9]/gi,'')||'mp4';
+  inputName='input.'+ext;const out='tiktok_hq_output.mp4';
+  try{
+    setStatus('ভিডিও memory-তে নেওয়া হচ্ছে…');
+    await ff.writeFile(inputName,await util.fetchFile(selected));
+
+    const vfParts=[videoFilter(framingEl.value)];
+    if(fpsEl.value!=='smart')vfParts.push('fps='+fpsEl.value);
+    const vf=vfParts.join(',');
+    const fpsForGop=fpsEl.value==='smart'?60:Number(fpsEl.value);
+    const g=Math.max(2,Math.round(fpsForGop*2));
+
+    setStatus('Maximum quality encode শুরু হচ্ছে… ফোনের CPU অনুযায়ী সময় লাগতে পারে.');
+    const args=[
+      '-i',inputName,
+      '-map','0:v:0','-map','0:a:0?',
+      '-vf',vf,
+      '-c:v','libx264','-preset','slow','-profile:v','high','-level','4.2',
+      '-pix_fmt','yuv420p','-crf',qualityEl.value,
+      '-maxrate',maxrateEl.value,'-bufsize',String(Number.parseInt(maxrateEl.value,10)*2)+'M',
+      '-g',String(g),'-keyint_min',String(g),'-sc_threshold','0',
+      '-c:a','aac','-b:a','320k','-ar','48000','-ac','2',
+      '-movflags','+faststart','-y',out
+    ];
+    const code=await ff.exec(args);
+    if(code!==0)throw new Error('FFmpeg exited with code '+code);
+
+    setStatus('Output তৈরি হচ্ছে…');
+    const data=await ff.readFile(out);
+    const bytes=data instanceof Uint8Array?data:new Uint8Array(data);
+    const blob=new Blob([bytes],{type:'video/mp4'});
+    if(outputUrl)URL.revokeObjectURL(outputUrl);
+    outputUrl=URL.createObjectURL(blob);
+    preview.src=outputUrl;preview.load();previewCard.classList.remove('hidden');
+
+    const base=(selected.name.replace(/\.[^.]+$/,'')||'video')+'_TikTok_HQ_1080p.mp4';
+    dl.href=outputUrl;dl.download=base;dl.textContent='⬇️ Download '+base;dl.classList.remove('hidden');
+    shareBtn.classList.toggle('hidden',typeof navigator.share!=='function');
+    bar.value=1;setStatus('✅ Done — HQ MP4 ready.','ok');
+  }catch(e){
+    console.error(e);
+    if(e?.name==='AbortError')setStatus('Encoding cancelled.','warn');
+    else setStatus('❌ Encode failed: '+(e?.message||String(e)),'bad');
+  }finally{
+    await cleanupFile(inputName);await cleanupFile('tiktok_hq_output.mp4');
+    busy=false;encBtn.disabled=!selected||!loaded;loadBtn.disabled=loaded;cancelBtn.classList.add('hidden');
+  }
+}
+encBtn.addEventListener('click',encode);
+
+cancelBtn.addEventListener('click',()=>{
+  if(!busy||!ff)return;
+  try{ff.terminate()}catch(_){ }
+  ff=null;loaded=false;busy=false;cancelBtn.classList.add('hidden');encBtn.disabled=true;loadBtn.disabled=false;bar.value=0;
+  setStatus('Encoding cancelled. FFmpeg engine reset. Load FFmpeg again.','warn');
+});
+
+shareBtn.addEventListener('click',async()=>{
+  if(!outputUrl||typeof navigator.share!=='function')return;
+  try{
+    const blob=await (await fetch(outputUrl)).blob();
+    const file=new File([blob],'TikTok_HQ_1080p.mp4',{type:'video/mp4'});
+    if(typeof navigator.canShare==='function' && !navigator.canShare({files:[file]}))throw new Error('This browser does not support video file sharing.');
+    await navigator.share({files:[file],title:'TikTok HQ Video'});
+  }catch(e){if(e?.name!=='AbortError')setStatus('Share failed: '+(e?.message||String(e)),'bad')}
+});
+
 updatePreset();
 </script>
 </body>
