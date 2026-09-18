@@ -2,304 +2,319 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#080b10">
-<title>TikTok HQ Encoder — Stable</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#07090d">
+<title>TikTok HQ Encoder — Final</title>
 <style>
-:root{color-scheme:dark}
+:root{color-scheme:dark;--bg:#07090d;--card:#11151c;--line:#252c36;--muted:#a9b1bd;--text:#f4f6f8;--good:#8ce99a;--warn:#ffd27a;--bad:#ff8f8f}
 *{box-sizing:border-box}
-body{margin:0;background:#080b10;color:#f5f7fa;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
-.wrap{max-width:820px;margin:auto;padding:16px}
-.card{background:#11161e;border:1px solid #26303b;border-radius:18px;padding:18px;margin:12px 0}
-h1{font-size:23px;margin:0 0 7px}.muted{color:#aab4c0;font-size:13px;line-height:1.5}
-input[type=file]{width:100%;padding:12px;border:1px solid #303a46;border-radius:12px;background:#0c1117;color:#fff}
-button,.download{display:block;width:100%;border:0;border-radius:12px;padding:13px 14px;margin-top:10px;background:#f3f5f7;color:#080b10;font-weight:800;font-size:15px;text-decoration:none;text-align:center}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+.wrap{max-width:780px;margin:auto;padding:16px 14px 40px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;margin:12px 0}
+h1{font-size:23px;margin:0 0 6px}
+h2{font-size:17px;margin:0 0 10px}
+.muted{color:var(--muted);font-size:13px;line-height:1.5}
+.drop{border:1.5px dashed #4b5665;border-radius:16px;padding:24px 14px;text-align:center}
+input[type=file]{width:100%;padding:11px;border-radius:12px;background:#0c1016;color:var(--text);border:1px solid var(--line)}
+button,.download{display:block;width:100%;border:0;border-radius:12px;padding:13px 14px;margin-top:10px;background:#f3f5f7;color:#0a0c10;font-weight:800;font-size:15px;text-decoration:none;text-align:center}
+button.secondary{background:#242a33;color:#f3f5f7}
+button.danger{background:#3b2020;color:#ffdede}
 button:disabled{opacity:.45}
-progress{width:100%;height:13px;margin-top:12px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
-.stat{background:#0c1117;border:1px solid #222b36;border-radius:12px;padding:11px}.label{font-size:12px;color:#9ba7b5}.value{font-weight:700;margin-top:3px;overflow-wrap:anywhere}
-video{width:100%;max-height:62vh;background:#000;border-radius:12px;margin-top:10px}
-.ok{color:#8ce99a}.warn{color:#ffd27a}.err{color:#ff8f8f}
-.small{font-size:12px;color:#8e99a7}
-select{width:100%;padding:12px;border-radius:12px;background:#0c1117;color:#fff;border:1px solid #303a46}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{background:#0c1016;border:1px solid #232a34;border-radius:12px;padding:11px;min-width:0}
+.label{font-size:11px;color:#9da7b4}
+.value{font-weight:700;margin-top:3px;overflow-wrap:anywhere}
+select{width:100%;padding:12px;border-radius:12px;background:#0c1016;color:var(--text);border:1px solid var(--line)}
+progress{width:100%;height:14px}
+video{width:100%;max-height:66vh;background:#000;border-radius:12px;margin-top:10px}
+pre{white-space:pre-wrap;word-break:break-word;background:#0b0e13;border:1px solid var(--line);border-radius:12px;padding:11px;font-size:11px;max-height:180px;overflow:auto}
+.ok{color:var(--good)}.warn{color:var(--warn)}.bad{color:var(--bad)}
+.badge{display:inline-block;padding:4px 8px;border-radius:999px;background:#1c232d;color:#d9e0e8;font-size:11px}
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="card">
     <h1>🎬 TikTok HQ Encoder</h1>
-    <div class="muted">Local browser FFmpeg encoder. The video stays in your browser while encoding. This tool does not bypass TikTok's server-side compression.</div>
-  </div>
-
-  <div class="card">
-    <b>1. Choose source video</b>
-    <div class="muted" style="margin:6px 0 12px">For the first test, use a short 10–20 second video.</div>
-    <input id="file" type="file" accept="video/*,.mp4,.mov,.mkv,.webm">
-    <div id="info" class="grid"></div>
-  </div>
-
-  <div class="card">
-    <b>2. Output mode</b>
-    <select id="mode">
-      <option value="contain">Preserve full frame (9:16 with padding)</option>
-      <option value="cover">Full 9:16 frame (center crop)</option>
-    </select>
-    <div class="small" style="margin-top:8px">Contain preserves the entire source image. Cover fills 1080×1920 but can crop the sides/top.</div>
-  </div>
-
-  <div class="card">
-    <button id="load">1) Load FFmpeg Engine</button>
-    <button id="encode" disabled>2) Encode HQ MP4</button>
-    <button id="cancel" disabled>Cancel</button>
-    <progress id="bar" value="0" max="1"></progress>
-    <div id="status" class="muted" style="margin-top:8px">Ready.</div>
-  </div>
-
-  <div class="card" id="previewCard" style="display:none">
-    <b>Output preview</b>
-    <video id="preview" controls playsinline></video>
-    <a id="download" class="download" download>⬇️ Download HQ MP4</a>
-    <button id="share" style="display:none">Share output</button>
-  </div>
-
-  <div class="card">
     <div class="muted">
-      <b>HQ policy:</b> H.264 High • yuv420p • CRF 14 • maxrate 40 Mbps • 2-second GOP • AAC 320 kbps.
-      Source FPS is preserved up to 60 FPS; the encoder does not invent frames above the source rate.
+      Final browser-only encoder. The root FFmpeg worker is local/same-origin on GitHub Pages,
+      while the pinned FFmpeg core is downloaded as blobs from CDN fallbacks. Processing stays
+      on the device.
     </div>
+    <div style="margin-top:10px">
+      <span class="badge">1080×1920</span>
+      <span class="badge">H.264 High</span>
+      <span class="badge">yuv420p</span>
+      <span class="badge">AAC 320k</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>1. Select video</h2>
+    <div class="drop">
+      <input id="file" type="file" accept="video/*">
+      <div class="muted" style="margin-top:9px">For Edge Android, test with a 10–20 second clip first.</div>
+    </div>
+    <div id="info" class="grid" style="margin-top:10px"></div>
+  </div>
+
+  <div class="card">
+    <h2>2. Frame mode</h2>
+    <select id="mode">
+      <option value="contain">Preserve full frame — 9:16 with padding</option>
+      <option value="cover">Fill 9:16 — center crop</option>
+    </select>
+    <div class="muted" style="margin-top:8px">Contain never cuts the original frame. Crop fills the full 1080×1920 canvas.</div>
+  </div>
+
+  <div class="card">
+    <h2>3. Engine</h2>
+    <button id="load">Load FFmpeg Engine</button>
+    <button id="cancel" class="danger" disabled>Cancel / Reset Engine</button>
+    <div style="margin-top:12px"><progress id="bar" value="0" max="1"></progress></div>
+    <div id="status" class="muted" style="margin-top:8px">Engine not loaded.</div>
+  </div>
+
+  <div class="card">
+    <h2>4. Encode</h2>
+    <button id="encode" disabled>Encode HQ MP4</button>
+    <div class="muted" style="margin-top:8px">
+      Source FPS is preserved up to 60. No fake frame generation. Video uses CRF 16, H.264 High,
+      high bitrate ceiling, 48 kHz AAC and faststart.
+    </div>
+  </div>
+
+  <div class="card" id="outputCard" style="display:none">
+    <h2>Output</h2>
+    <video id="preview" controls playsinline></video>
+    <div id="outInfo" class="grid" style="margin-top:10px"></div>
+    <a id="download" class="download" download="TikTok_HQ.mp4">Download MP4</a>
+    <button id="share" class="secondary" style="display:none">Share video</button>
+  </div>
+
+  <div class="card">
+    <h2>Diagnostics</h2>
+    <pre id="log">Ready.</pre>
   </div>
 </div>
 
-<script>
-"use strict";
+<script type="module">
+import { FFmpeg } from "./assets/ffmpeg/ffmpeg-client.js";
 
 const $ = id => document.getElementById(id);
-const fileEl=$("file"), info=$("info"), loadBtn=$("load"), encBtn=$("encode"),
-      cancelBtn=$("cancel"), bar=$("bar"), status=$("status"),
-      preview=$("preview"), previewCard=$("previewCard"), download=$("download"),
-      shareBtn=$("share"), modeEl=$("mode");
+const fileEl=$("file"), modeEl=$("mode"), loadBtn=$("load"),
+      cancelBtn=$("cancel"), encBtn=$("encode"), bar=$("bar"),
+      status=$("status"), logEl=$("log"), preview=$("preview"),
+      outputCard=$("outputCard"), outInfo=$("outInfo"), download=$("download"),
+      shareBtn=$("share"), info=$("info");
 
-let selected=null, ff=null, loaded=false, abortController=null, outputURL=null;
-let sourceFPS=30;
-
-const CDN_CANDIDATES = [
-  {
-    main:"https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.15/dist/umd/ffmpeg.js",
-    chunk:"https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.15/dist/umd/814.ffmpeg.js",
-    core:"https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.10/dist/umd/ffmpeg-core.js"
-  },
-  {
-    main:"https://unpkg.com/@ffmpeg/ffmpeg@0.12.15/dist/umd/ffmpeg.js",
-    chunk:"https://unpkg.com/@ffmpeg/ffmpeg@0.12.15/dist/umd/814.ffmpeg.js",
-    core:"https://unpkg.com/@ffmpeg/core@0.12.10/dist/umd/ffmpeg-core.js"
-  }
+const CORE_CANDIDATES = [
+  ["https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.10/dist/umd/ffmpeg-core.js",
+   "https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.10/dist/umd/ffmpeg-core.wasm"],
+  ["https://unpkg.com/@ffmpeg/core@0.12.10/dist/umd/ffmpeg-core.js",
+   "https://unpkg.com/@ffmpeg/core@0.12.10/dist/umd/ffmpeg-core.wasm"],
+  ["https://cdnjs.cloudflare.com/ajax/libs/ffmpeg-core/0.12.10/umd/ffmpeg-core.js",
+   "https://cdnjs.cloudflare.com/ajax/libs/ffmpeg-core/0.12.10/umd/ffmpeg-core.wasm"]
 ];
 
-function fmtMB(n){return (n/1048576).toFixed(1)+" MB";}
-function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
-function ratioToNumber(x){
-  if(!x || typeof x!=="string") return 30;
-  const p=x.split("/").map(Number);
-  if(p.length===2 && p[1]) return p[0]/p[1];
-  const n=Number(x); return Number.isFinite(n)?n:30;
-}
-function setStatus(html){status.innerHTML=html;}
+let selected=null, ff=null, loaded=false, busy=false, outputURL="", coreBlobURLs=[], logText="";
 
-fileEl.addEventListener("change", async ()=>{
+const fmtMB = n => (n/1024/1024).toFixed(1)+" MB";
+const esc = s => String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+function log(s){
+  logText += String(s) + "\n";
+  if(logText.length > 14000) logText = logText.slice(-14000);
+  logEl.textContent = logText;
+  logEl.scrollTop = logEl.scrollHeight;
+}
+function setStatus(s,c=""){ status.textContent=s; status.className="muted "+c; }
+function setProgress(v){ bar.value=Math.max(0,Math.min(1,Number(v)||0)); }
+
+async function blobURL(url, mime){
+  const r=await fetch(url,{mode:"cors",cache:"force-cache"});
+  if(!r.ok) throw new Error("HTTP "+r.status+" from "+url);
+  const data=await r.arrayBuffer();
+  const u=URL.createObjectURL(new Blob([data],{type:mime}));
+  coreBlobURLs.push(u);
+  return u;
+}
+
+async function loadCore(){
+  let last=null;
+  for(const [js,wasm] of CORE_CANDIDATES){
+    try{
+      log("Trying FFmpeg core: "+js);
+      const [coreURL,wasmURL]=await Promise.all([
+        blobURL(js,"text/javascript"),
+        blobURL(wasm,"application/wasm")
+      ]);
+      return {coreURL,wasmURL};
+    }catch(e){
+      last=e;
+      log("Core candidate failed: "+e.message);
+    }
+  }
+  throw last || new Error("All FFmpeg core CDN candidates failed.");
+}
+
+async function sourceMetadata(file){
+  const u=URL.createObjectURL(file), v=document.createElement("video");
+  v.preload="metadata"; v.muted=true; v.src=u;
+  await new Promise(resolve=>{v.onloadedmetadata=resolve;v.onerror=resolve;});
+  const m={width:v.videoWidth||0,height:v.videoHeight||0,duration:Number.isFinite(v.duration)?v.duration:0};
+  URL.revokeObjectURL(u); return m;
+}
+
+fileEl.addEventListener("change",async()=>{
   selected=fileEl.files?.[0]||null;
-  loaded && (encBtn.disabled=!selected);
-  if(outputURL){URL.revokeObjectURL(outputURL);outputURL=null;}
-  previewCard.style.display="none"; bar.value=0;
+  outputCard.style.display="none"; shareBtn.style.display="none";
+  if(outputURL){URL.revokeObjectURL(outputURL);outputURL="";}
+  setProgress(0); encBtn.disabled=!(selected&&loaded);
   if(!selected){info.innerHTML="";return;}
-  const url=URL.createObjectURL(selected);
-  const v=document.createElement("video");
-  v.preload="metadata"; v.muted=true; v.src=url;
-  await new Promise(r=>{v.onloadedmetadata=r;v.onerror=r;});
+  const m=await sourceMetadata(selected);
   info.innerHTML=`
     <div class="stat"><div class="label">File</div><div class="value">${esc(selected.name)}</div></div>
     <div class="stat"><div class="label">Size</div><div class="value">${fmtMB(selected.size)}</div></div>
-    <div class="stat"><div class="label">Resolution</div><div class="value">${v.videoWidth||"?"} × ${v.videoHeight||"?"}</div></div>
-    <div class="stat"><div class="label">Duration</div><div class="value">${Number.isFinite(v.duration)?v.duration.toFixed(1)+" s":"?"}</div></div>`;
-  URL.revokeObjectURL(url);
+    <div class="stat"><div class="label">Resolution</div><div class="value">${m.width||"?"} × ${m.height||"?"}</div></div>
+    <div class="stat"><div class="label">Duration</div><div class="value">${m.duration?m.duration.toFixed(2)+" s":"?"}</div></div>`;
 });
 
-async function fetchBlobURL(url,type){
-  const r=await fetch(url,{mode:"cors",cache:"force-cache"});
-  if(!r.ok) throw new Error("HTTP "+r.status+" while loading "+url);
-  const b=await r.blob();
-  return URL.createObjectURL(new Blob([b],{type}));
+function bindEvents(instance){
+  instance.on("log",d=>log(d?.message||d));
+  instance.on("progress",d=>{if(busy&&Number.isFinite(d?.progress))setProgress(d.progress);});
 }
 
-async function loadFromCandidate(c){
-  // Fetch the UMD main and its split worker chunk, then patch the main
-  // so the Worker is created from a same-origin Blob URL instead of CDN.
-  const [mainText, chunkResp, coreJS, coreWasm] = await Promise.all([
-    fetch(c.main,{mode:"cors",cache:"force-cache"}).then(r=>{if(!r.ok)throw new Error("main HTTP "+r.status);return r.text();}),
-    fetch(c.chunk,{mode:"cors",cache:"force-cache"}).then(r=>{if(!r.ok)throw new Error("worker HTTP "+r.status);return r.blob();}),
-    fetch(c.core,{mode:"cors",cache:"force-cache"}).then(r=>{if(!r.ok)throw new Error("core HTTP "+r.status);return r.blob();}),
-    fetch(c.core.replace(/\.js$/,".wasm"),{mode:"cors",cache:"force-cache"}).then(r=>{if(!r.ok)throw new Error("wasm HTTP "+r.status);return r.blob();})
-  ]);
-
-  const workerURL=URL.createObjectURL(new Blob([await chunkResp.arrayBuffer()],{type:"text/javascript"}));
-  let patched=mainText;
-
-  // This is the webpack split-worker expression used by @ffmpeg/ffmpeg 0.12.x UMD.
-  const patterns=[
-    /new Worker\(e\.p\+e\.u\(814\),\{type:void 0\}\)/,
-    /new Worker\(e\.p\+e\.u\(814\),\{type:undefined\}\)/
-  ];
-  let replaced=false;
-  for(const re of patterns){
-    if(re.test(patched)){
-      patched=patched.replace(re,`new Worker(${JSON.stringify(workerURL)},{type:void 0})`);
-      replaced=true; break;
-    }
-  }
-  if(!replaced) throw new Error("FFmpeg UMD worker pattern changed; refusing unsafe fallback.");
-
-  const mainURL=URL.createObjectURL(new Blob([patched],{type:"text/javascript"}));
-  await import(mainURL);
-  const F=window.FFmpegWASM?.FFmpeg;
-  if(!F) throw new Error("FFmpeg UMD loaded but FFmpeg class was not exported.");
-
-  const instance=new F();
-  instance.on("log",({message})=>{
-    if(message && /error|invalid|failed/i.test(message)) console.log("[ffmpeg]",message);
-  });
-  instance.on("progress",({progress})=>{
-    if(Number.isFinite(progress)) bar.value=Math.max(0,Math.min(1,progress));
-  });
-
-  const coreURL=URL.createObjectURL(new Blob([await coreJS.arrayBuffer()],{type:"text/javascript"}));
-  const wasmURL=URL.createObjectURL(new Blob([await coreWasm.arrayBuffer()],{type:"application/wasm"}));
-
-  await instance.load({coreURL,wasmURL});
-  return {instance,urls:[workerURL,mainURL,coreURL,wasmURL]};
-}
-
-loadBtn.addEventListener("click",async()=>{
-  if(loaded)return;
-  loadBtn.disabled=true; cancelBtn.disabled=true;
-  setStatus("Loading FFmpeg browser engine…<br><span class='small'>First load downloads the FFmpeg core and may take a while on mobile.</span>");
-  let lastErr=null;
+async function loadEngine(){
+  if(loaded||busy)return;
+  busy=true;loadBtn.disabled=true;cancelBtn.disabled=false;
+  setStatus("Loading FFmpeg engine…","warn");log("Starting local same-origin worker.");
   try{
-    for(const candidate of CDN_CANDIDATES){
-      try{
-        const result=await loadFromCandidate(candidate);
-        ff=result.instance;
-        loaded=true;
-        setStatus("<span class='ok'>✅ FFmpeg ready.</span>");
-        encBtn.disabled=!selected;
-        return;
-      }catch(e){
-        console.warn("FFmpeg candidate failed:",e);
-        lastErr=e;
-      }
-    }
-    throw lastErr||new Error("No FFmpeg CDN could be loaded.");
+    ff=new FFmpeg(); bindEvents(ff);
+    const core=await loadCore();
+    setStatus("Initializing FFmpeg core…","warn");
+    await ff.load(core);
+    loaded=true;encBtn.disabled=!selected;
+    setStatus("Engine ready.","ok");log("FFmpeg engine loaded.");
   }catch(e){
-    loadBtn.disabled=false;
-    setStatus("<span class='err'>❌ Engine load failed.</span><br>"+esc(e?.message||e));
-  }
-});
-
-async function detectFPS(){
-  sourceFPS=30;
-  if(!ff||!selected)return;
-  const ext=(selected.name.split(".").pop()||"mp4").replace(/[^a-z0-9]/gi,"")||"mp4";
-  const name="probe."+ext;
-  try{
-    await ff.writeFile(name,new Uint8Array(await selected.arrayBuffer()));
-    const data=await ff.ffprobe([
-      "-v","error","-select_streams","v:0",
-      "-show_entries","stream=r_frame_rate,avg_frame_rate",
-      "-of","json",name
-    ]);
-    const txt=new TextDecoder().decode(data);
-    const j=JSON.parse(txt);
-    const st=j.streams?.[0];
-    const fps=Math.min(60,Math.max(1,ratioToNumber(st?.avg_frame_rate||st?.r_frame_rate)));
-    sourceFPS=fps;
-    await ff.deleteFile(name);
-  }catch(e){
-    try{await ff.deleteFile(name)}catch{}
+    setStatus("❌ Engine load failed: "+(e?.message||e),"bad");
+    log("ENGINE ERROR: "+(e?.stack||e));
+    if(ff)try{ff.terminate()}catch{}
+    ff=null;loaded=false;encBtn.disabled=true;
+  }finally{
+    busy=false;loadBtn.disabled=loaded;cancelBtn.disabled=!ff;
   }
 }
 
-encBtn.addEventListener("click",async()=>{
-  if(!selected||!ff||!loaded)return;
-  encBtn.disabled=true;loadBtn.disabled=true;cancelBtn.disabled=false;
-  bar.value=0;
-  abortController=new AbortController();
-  if(outputURL){URL.revokeObjectURL(outputURL);outputURL=null;}
-  previewCard.style.display="none";
+async function resetEngine(){
+  busy=false;
+  if(ff)try{ff.terminate()}catch{}
+  ff=null;loaded=false;encBtn.disabled=true;loadBtn.disabled=false;cancelBtn.disabled=true;
+  setProgress(0);setStatus("Engine reset. Ready to load again.");
+  for(const u of coreBlobURLs)try{URL.revokeObjectURL(u)}catch{}
+  coreBlobURLs=[];
+}
 
-  const ext=(selected.name.split(".").pop()||"mp4").replace(/[^a-z0-9]/gi,"")||"mp4";
-  const input="input."+ext, output="tiktok_hq_output.mp4";
-
+async function probe(input){
   try{
-    setStatus("Reading source video…");
+    const rc=await ff.ffprobe(["-v","error","-show_entries","stream=index,codec_type,avg_frame_rate,r_frame_rate,width,height:format=duration","-of","json",input]);
+    const txt=typeof rc==="string"?rc:new TextDecoder().decode(await ff.readFile("probe.json","utf8"));
+    return JSON.parse(txt);
+  }catch{
+    return null;
+  }
+}
+
+function fpsOf(s){
+  const x=s?.avg_frame_rate||s?.r_frame_rate;
+  if(!x)return 30;
+  const [a,b]=String(x).split("/").map(Number);
+  const n=(Number.isFinite(a)&&Number.isFinite(b)&&b)?a/b:Number(x);
+  return Number.isFinite(n)&&n>0?n:30;
+}
+
+async function encode(){
+  if(!selected||!loaded||busy)return;
+  busy=true;encBtn.disabled=true;loadBtn.disabled=true;cancelBtn.disabled=false;
+  outputCard.style.display="none";setProgress(0);logText="";log("Starting HQ encode…");
+  const ext=(selected.name.split(".").pop()||"mp4").replace(/[^a-z0-9]/gi,"")||"mp4";
+  const input="input."+ext, output="output_"+Date.now()+".mp4";
+  try{
     await ff.writeFile(input,new Uint8Array(await selected.arrayBuffer()));
-    await detectFPS();
-    const fps=(Math.round(sourceFPS*100)/100).toString();
+    let fps=30,hasAudio=true;
+    try{
+      const jsonOut="probe_"+Date.now()+".json";
+      const rc=await ff.ffprobe(["-v","error","-show_streams","-show_format","-of","json",input]);
+      if(typeof rc==="string"){
+        const m=JSON.parse(rc);const v=m.streams?.find(x=>x.codec_type==="video");
+        if(v)fps=Math.min(60,Math.max(1,fpsOf(v)));
+        hasAudio=!!m.streams?.some(x=>x.codec_type==="audio");
+      }else{
+        await ff.ffprobe(["-v","error","-show_streams","-show_format","-of","json",input,"-o",jsonOut]);
+        const txt=await ff.readFile(jsonOut,"utf8");const m=JSON.parse(txt);
+        const v=m.streams?.find(x=>x.codec_type==="video");
+        if(v)fps=Math.min(60,Math.max(1,fpsOf(v)));
+        hasAudio=!!m.streams?.some(x=>x.codec_type==="audio");
+        try{await ff.deleteFile(jsonOut)}catch{}
+      }
+    }catch(e){log("Probe fallback: "+e.message);}
 
-    let vf;
-    if(modeEl.value==="cover"){
-      vf=`scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,setsar=1,fps=${fps}`;
-    }else{
-      vf=`scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2:color=black,setsar=1,fps=${fps}`;
-    }
-
-    setStatus(`Encoding HQ… source FPS detected: ${esc(fps)}<br><span class="small">CRF 14 • H.264 High • up to 40 Mbps • AAC 320k</span>`);
+    const g=Math.max(2,Math.round(fps*2));
+    const vf=modeEl.value==="cover"
+      ?"scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920"
+      :"scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2:color=black";
 
     const args=[
-      "-hide_banner","-y","-i",input,
+      "-hide_banner","-nostdin","-i",input,
+      "-map","0:v:0",...(hasAudio?["-map","0:a:0?"]:[]),
       "-vf",vf,
-      "-c:v","libx264","-preset","slow","-profile:v","high","-level","4.2",
-      "-pix_fmt","yuv420p","-crf","14","-maxrate","40M","-bufsize","80M",
-      "-g",String(Math.max(24,Math.round(sourceFPS*2))),
-      "-keyint_min",String(Math.max(24,Math.round(sourceFPS*2))),
-      "-sc_threshold","0",
-      "-c:a","aac","-b:a","320k","-ar","48000","-ac","2",
-      "-movflags","+faststart",
-      output
+      "-c:v","libx264","-preset","slow","-profile:v","high","-level:v","4.2",
+      "-pix_fmt","yuv420p","-crf","16","-maxrate","40M","-bufsize","80M",
+      "-g",String(g),"-keyint_min",String(g),"-sc_threshold","0","-movflags","+faststart"
     ];
-    await ff.exec(args,-1,{signal:abortController.signal});
-    setStatus("Preparing output…");
-    const data=await ff.readFile(output);
-    const blob=new Blob([data.buffer],{type:"video/mp4"});
-    outputURL=URL.createObjectURL(blob);
-    preview.src=outputURL;
-    previewCard.style.display="block";
-    const base=(selected.name.replace(/\.[^.]+$/,"")||"video");
-    download.href=outputURL;
-    download.download=base+"_TikTok_HQ.mp4";
-    download.textContent="⬇️ Download "+download.download;
-    if(navigator.share && navigator.canShare){
+    if(hasAudio)args.push("-c:a","aac","-b:a","320k","-ar","48000","-ac","2");
+    log("FPS: "+(Math.round(fps*1000)/1000)+"; audio: "+hasAudio);
+    setStatus("Encoding… keep this tab open.","warn");
+    const rc=await ff.exec(args,0);
+    if(rc!==0)throw new Error("FFmpeg exited with code "+rc);
+    const out=await ff.readFile(output,"binary");
+    const bytes=out instanceof Uint8Array?out:new Uint8Array(out);
+    outputURL=URL.createObjectURL(new Blob([bytes.buffer],{type:"video/mp4"}));
+    preview.src=outputURL;download.href=outputURL;
+    const stem=(selected.name.replace(/\.[^.]+$/,"")||"video").replace(/[^\w-]+/g,"_");
+    download.download=stem+"_TikTok_HQ.mp4";
+    outInfo.innerHTML=`
+      <div class="stat"><div class="label">Output</div><div class="value">${esc(download.download)}</div></div>
+      <div class="stat"><div class="label">Size</div><div class="value">${fmtMB(bytes.byteLength)}</div></div>
+      <div class="stat"><div class="label">Canvas</div><div class="value">1080 × 1920</div></div>
+      <div class="stat"><div class="label">Video</div><div class="value">H.264 High • CRF 16</div></div>`;
+    outputCard.style.display="block";
+    if(navigator.canShare){
       try{
-        const f=new File([blob],download.download,{type:"video/mp4"});
-        shareBtn.style.display=navigator.canShare({files:[f]})?"block":"none";
-        shareBtn.onclick=()=>navigator.share({files:[f],title:"TikTok HQ Video"});
-      }catch{shareBtn.style.display="none";}
+        const f=new File([bytes],download.download,{type:"video/mp4"});
+        if(navigator.canShare({files:[f]})){
+          shareBtn.style.display="block";
+          shareBtn.onclick=()=>navigator.share({files:[f],title:"TikTok HQ Video"});
+        }
+      }catch{}
     }
-    bar.value=1;
-    setStatus("<span class='ok'>✅ Done — HQ MP4 is ready.</span>");
+    setProgress(1);setStatus("✅ Encode complete.","ok");log("Output created: "+fmtMB(bytes.byteLength));
   }catch(e){
-    if(e?.name==="AbortError"){
-      setStatus("<span class='warn'>⏹️ Encoding cancelled.</span>");
-    }else{
-      console.error(e);
-      setStatus("<span class='err'>❌ Encode failed.</span><br>"+esc(e?.message||e));
-    }
+    setStatus("❌ Encode failed: "+(e?.message||e),"bad");log("ENCODE ERROR: "+(e?.stack||e));
   }finally{
     try{await ff.deleteFile(input)}catch{}
     try{await ff.deleteFile(output)}catch{}
-    abortController=null;cancelBtn.disabled=true;encBtn.disabled=!selected;loadBtn.disabled=false;
+    busy=false;encBtn.disabled=!selected||!loaded;loadBtn.disabled=false;cancelBtn.disabled=false;
   }
-});
+}
 
-cancelBtn.addEventListener("click",()=>{
-  if(abortController)abortController.abort();
+loadBtn.addEventListener("click",loadEngine);
+cancelBtn.addEventListener("click",resetEngine);
+encBtn.addEventListener("click",encode);
+window.addEventListener("beforeunload",()=>{
+  if(ff)try{ff.terminate()}catch{}
+  if(outputURL)try{URL.revokeObjectURL(outputURL)}catch{}
+  for(const u of coreBlobURLs)try{URL.revokeObjectURL(u)}catch{}
 });
 </script>
 </body>
