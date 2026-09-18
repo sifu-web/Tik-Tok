@@ -40,3 +40,9 @@ The previous build could fail during `selectedFile.arrayBuffer()` on Edge/Androi
 Chromium uses this DOMException for a file/Blob that becomes unreadable after the reference was acquired. This build reads the selected file immediately after the picker returns and keeps the byte snapshot for encoding, so the encode stage never rereads the original Android file-provider reference.
 
 If the picker itself cannot expose the bytes, select a copy stored in Downloads/device storage rather than a temporary/cloud-only reference.
+
+
+## Android file-read fix (v4)
+The encoder snapshots the selected video's bytes immediately inside the file-picker change event and then uses that in-memory copy for encoding. The encode step no longer calls `arrayBuffer()` on the original Android file-provider reference. This targets Chromium `NotReadableError` / `ERR_UPLOAD_FILE_CHANGED` behavior.
+
+If the immediate snapshot itself fails, the page asks the user to select a locally stored copy from Downloads/device storage. Cloud/gallery provider references can remain unreadable to a browser even when the picker can display them.
