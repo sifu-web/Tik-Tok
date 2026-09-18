@@ -1,0 +1,12 @@
+{
+  "name": "TikTok HQ Encoder",
+  "short_name": "TikTok HQ",
+  "description": "Private browser-based 1080x1920 video encoder.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#07090d",
+  "theme_color": "#07090d",
+  "icons": [
+    {"src":"assets/icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}
+  ]
+}
