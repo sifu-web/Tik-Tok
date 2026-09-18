@@ -273,18 +273,15 @@ async function encode(){
     let fps=30,hasAudio=true;
     try{
       const jsonOut="probe_"+Date.now()+".json";
-      const rc=await ff.ffprobe(["-v","error","-show_streams","-show_format","-of","json",input]);
-      if(typeof rc==="string"){
-        const m=JSON.parse(rc);const v=m.streams?.find(x=>x.codec_type==="video");
-        if(v)fps=Math.min(60,Math.max(1,fpsOf(v)));
-        hasAudio=!!m.streams?.some(x=>x.codec_type==="audio");
-      }else{
-        await ff.ffprobe(["-v","error","-show_streams","-show_format","-of","json",input,"-o",jsonOut]);
+      const rc=await ff.ffprobe(["-v","error","-show_streams","-show_format","-of","json",input,"-o",jsonOut]);
+      if(rc===0){
         const txt=await ff.readFile(jsonOut,"utf8");const m=JSON.parse(txt);
         const v=m.streams?.find(x=>x.codec_type==="video");
         if(v)fps=Math.min(60,Math.max(1,fpsOf(v)));
         hasAudio=!!m.streams?.some(x=>x.codec_type==="audio");
         try{await ff.deleteFile(jsonOut)}catch{}
+      }else{
+        throw new Error("ffprobe exited with code "+rc);
       }
     }catch(e){log("Probe fallback: "+e.message);}
 
@@ -299,7 +296,8 @@ async function encode(){
       "-vf",vf,
       "-c:v","libx264","-preset","slow","-profile:v","high","-level:v","4.2",
       "-pix_fmt","yuv420p","-crf","16","-maxrate","40M","-bufsize","80M",
-      "-g",String(g),"-keyint_min",String(g),"-sc_threshold","0","-movflags","+faststart"
+      "-g",String(g),"-keyint_min",String(g),"-sc_threshold","0","-movflags","+faststart",
+      output
     ];
     if(hasAudio)args.push("-c:a","aac","-b:a","320k","-ar","48000","-ac","2");
     log("FPS: "+(Math.round(fps*1000)/1000)+"; audio: "+hasAudio);

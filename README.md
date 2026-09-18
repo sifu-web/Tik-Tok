@@ -52,3 +52,4 @@ If the immediate snapshot itself fails, the page asks the user to select a local
 The selected file is read immediately into a `Uint8Array`. The FFmpeg encode path uses only that byte snapshot and never calls `arrayBuffer()` on the original Android picker `File` object again. Metadata/preview use an in-memory Blob.
 
 If the initial snapshot itself fails, the page reports `FILE SNAPSHOT ERROR` before encoding.
+\n## v6 FFmpeg command fix\nFixed the encode argument list so the generated output filename is explicitly passed to FFmpeg. Also simplified ffprobe to the documented JSON output-file form and surfaced FFmpeg log messages in the page log.\n
