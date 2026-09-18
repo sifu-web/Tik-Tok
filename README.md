@@ -46,3 +46,9 @@ If the picker itself cannot expose the bytes, select a copy stored in Downloads/
 The encoder snapshots the selected video's bytes immediately inside the file-picker change event and then uses that in-memory copy for encoding. The encode step no longer calls `arrayBuffer()` on the original Android file-provider reference. This targets Chromium `NotReadableError` / `ERR_UPLOAD_FILE_CHANGED` behavior.
 
 If the immediate snapshot itself fails, the page asks the user to select a locally stored copy from Downloads/device storage. Cloud/gallery provider references can remain unreadable to a browser even when the picker can display them.
+
+
+## v5 file snapshot fix
+The selected file is read immediately into a `Uint8Array`. The FFmpeg encode path uses only that byte snapshot and never calls `arrayBuffer()` on the original Android picker `File` object again. Metadata/preview use an in-memory Blob.
+
+If the initial snapshot itself fails, the page reports `FILE SNAPSHOT ERROR` before encoding.

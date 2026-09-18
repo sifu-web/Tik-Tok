@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#07090d">
-<title>TikTok HQ Encoder — Final</title>
+<title>TikTok HQ Encoder — Final v5</title>
 <style>
 :root{color-scheme:dark;--bg:#07090d;--card:#11151c;--line:#252c36;--muted:#a9b1bd;--text:#f4f6f8;--good:#8ce99a;--warn:#ffd27a;--bad:#ff8f8f}
 *{box-sizing:border-box}
@@ -94,7 +94,7 @@ pre{white-space:pre-wrap;word-break:break-word;background:#0b0e13;border:1px sol
 
   <div class="card">
     <h2>Diagnostics</h2>
-    <pre id="log">Ready.</pre>
+    <pre id="log">Ready. The selected video is snapshotted immediately; encoding never rereads the Android picker reference.</pre>
   </div>
 </div>
 
@@ -117,7 +117,7 @@ const CORE_CANDIDATES = [
    "https://cdnjs.cloudflare.com/ajax/libs/ffmpeg-core/0.12.10/umd/ffmpeg-core.wasm"]
 ];
 
-let selected=null, ff=null, loaded=false, busy=false, outputURL="", coreBlobURLs=[], logText="";
+let selected=null, selectedBytes=null, selectedBlob=null, ff=null, loaded=false, busy=false, outputURL="", coreBlobURLs=[], logText="";
 
 const fmtMB = n => (n/1024/1024).toFixed(1)+" MB";
 const esc = s => String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -158,26 +158,55 @@ async function loadCore(){
   throw last || new Error("All FFmpeg core CDN candidates failed.");
 }
 
-async function sourceMetadata(file){
-  const u=URL.createObjectURL(file), v=document.createElement("video");
+async function sourceMetadata(blob){
+  const u=URL.createObjectURL(blob), v=document.createElement("video");
   v.preload="metadata"; v.muted=true; v.src=u;
   await new Promise(resolve=>{v.onloadedmetadata=resolve;v.onerror=resolve;});
   const m={width:v.videoWidth||0,height:v.videoHeight||0,duration:Number.isFinite(v.duration)?v.duration:0};
+  try{v.removeAttribute("src");v.load()}catch{}
   URL.revokeObjectURL(u); return m;
 }
 
 fileEl.addEventListener("change",async()=>{
-  selected=fileEl.files?.[0]||null;
+  const file=fileEl.files?.[0]||null;
+
+  selected=null;
+  selectedBytes=null;
+  selectedBlob=null;
+
   outputCard.style.display="none"; shareBtn.style.display="none";
   if(outputURL){URL.revokeObjectURL(outputURL);outputURL="";}
-  setProgress(0); encBtn.disabled=!(selected&&loaded);
-  if(!selected){info.innerHTML="";return;}
-  const m=await sourceMetadata(selected);
+  setProgress(0); encBtn.disabled=true; info.innerHTML="";
+
+  if(!file)return;
+
+  // Snapshot the bytes immediately. From this point onward the encoder never
+  // rereads the Android file-provider File reference.
+  try{
+    const buffer=await file.arrayBuffer();
+    if(!buffer || !buffer.byteLength) throw new Error("The selected file is empty or could not be read.");
+    selectedBytes=new Uint8Array(buffer);
+  }catch(e){
+    selectedBytes=null;
+    setStatus("❌ File snapshot failed: "+(e?.message||e),"bad");
+    log("FILE SNAPSHOT ERROR: "+(e?.name||"Error")+": "+(e?.message||e));
+    return;
+  }
+
+  selected={
+    name:file.name||"input.mp4",
+    size:selectedBytes.byteLength,
+    type:file.type||"video/mp4"
+  };
+  selectedBlob=new Blob([selectedBytes],{type:selected.type});
+
+  const m=await sourceMetadata(selectedBlob);
   info.innerHTML=`
     <div class="stat"><div class="label">File</div><div class="value">${esc(selected.name)}</div></div>
     <div class="stat"><div class="label">Size</div><div class="value">${fmtMB(selected.size)}</div></div>
     <div class="stat"><div class="label">Resolution</div><div class="value">${m.width||"?"} × ${m.height||"?"}</div></div>
     <div class="stat"><div class="label">Duration</div><div class="value">${m.duration?m.duration.toFixed(2)+" s":"?"}</div></div>`;
+  encBtn.disabled=!(selectedBytes?.byteLength && loaded);
 });
 
 function bindEvents(instance){
@@ -234,13 +263,13 @@ function fpsOf(s){
 }
 
 async function encode(){
-  if(!selected||!loaded||busy)return;
+  if(!selected||!selectedBytes?.byteLength||!loaded||busy)return;
   busy=true;encBtn.disabled=true;loadBtn.disabled=true;cancelBtn.disabled=false;
   outputCard.style.display="none";setProgress(0);logText="";log("Starting HQ encode…");
   const ext=(selected.name.split(".").pop()||"mp4").replace(/[^a-z0-9]/gi,"")||"mp4";
   const input="input."+ext, output="output_"+Date.now()+".mp4";
   try{
-    await ff.writeFile(input,new Uint8Array(await selected.arrayBuffer()));
+    await ff.writeFile(input,selectedBytes.slice());
     let fps=30,hasAudio=true;
     try{
       const jsonOut="probe_"+Date.now()+".json";
@@ -304,7 +333,7 @@ async function encode(){
   }finally{
     try{await ff.deleteFile(input)}catch{}
     try{await ff.deleteFile(output)}catch{}
-    busy=false;encBtn.disabled=!selected||!loaded;loadBtn.disabled=false;cancelBtn.disabled=false;
+    busy=false;encBtn.disabled=!(selected&&selectedBytes?.byteLength&&loaded);loadBtn.disabled=false;cancelBtn.disabled=false;
   }
 }
 
