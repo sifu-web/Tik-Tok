@@ -1,0 +1,4 @@
+<!doctype html><html><body>RUNNING<script type="module">
+import {FFmpeg} from "../assets/ffmpeg/ffmpeg-client.js";
+(async()=>{try{const f=new FFmpeg();await f.load({coreURL:"http://127.0.0.1:8765/_local_test/fake-core.js",wasmURL:"http://127.0.0.1:8765/_local_test/fake-core.wasm"});const src=new Uint8Array([1,2,3,4]);await f.writeFile("x.bin",src);const got=await f.readFile("x.bin");if(!(got instanceof Uint8Array)||got.length!==4||got[3]!==4)throw new Error("worker FS round-trip failed");f.terminate();document.body.textContent="PASS"}catch(e){document.body.textContent="FAIL: "+e.message;console.error(e)}})();
+</script></body></html>

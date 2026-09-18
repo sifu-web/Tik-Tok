@@ -1,0 +1,8 @@
+<!doctype html><html><body><div id="s">RUNNING</div><script>
+const s=document.getElementById('s');
+const w=new Worker('../assets/ffmpeg/ffmpeg-worker.js');
+w.onerror=e=>{s.textContent='ERROR:'+e.message;setTimeout(()=>window.close(),100)};
+let timer=setTimeout(()=>{s.textContent='TIMEOUT';try{w.terminate()}catch{};setTimeout(()=>window.close(),100)},3000);
+w.onmessage=e=>{if(e.data.type==='LOAD'){clearTimeout(timer);s.textContent='PASS';w.terminate();setTimeout(()=>window.close(),100)}};
+w.postMessage({id:1,type:'LOAD',data:{coreURL:'http://127.0.0.1:8765/_local_test2/fake-core.js',wasmURL:'http://127.0.0.1:8765/_local_test2/fake.wasm'}});
+</script></body></html>

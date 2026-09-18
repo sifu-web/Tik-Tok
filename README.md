@@ -30,3 +30,13 @@ Start with a 10–20 second clip. WebAssembly video encoding can consume signifi
 The encoder outputs a 1080×1920 H.264 High MP4, yuv420p, CRF 16, high bitrate ceiling, AAC 320 kbps/48 kHz and faststart. Source FPS is preserved up to 60 rather than inventing extra frames.
 
 This cannot bypass TikTok's server-side processing or reconstruct detail absent from the source.
+
+## Android file-provider fix
+
+The previous build could fail during `selectedFile.arrayBuffer()` on Edge/Android with:
+
+`NotReadableError: The requested file could not be read...`
+
+Chromium uses this DOMException for a file/Blob that becomes unreadable after the reference was acquired. This build reads the selected file immediately after the picker returns and keeps the byte snapshot for encoding, so the encode stage never rereads the original Android file-provider reference.
+
+If the picker itself cannot expose the bytes, select a copy stored in Downloads/device storage rather than a temporary/cloud-only reference.
